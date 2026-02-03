@@ -16,6 +16,9 @@ class DataProcessor(ABC):
 
 
 class NumericProcessor(DataProcessor):
+    def __init__(self) -> None:
+        super().__init__()
+
     def process(self, data: Any) -> str:
         print(f"Processing data: {data}")
 
@@ -43,6 +46,9 @@ class NumericProcessor(DataProcessor):
 
 
 class TextProcessor(DataProcessor):
+    def __init__(self) -> None:
+        super().__init__()
+
     def process(self, data: Any) -> str:
         print(f"Processing data: {data}")
 
@@ -64,6 +70,9 @@ class TextProcessor(DataProcessor):
 
 
 class LogProcessor(DataProcessor):
+    def __init__(self) -> None:
+        super().__init__()
+
     def process(self, data: Any) -> str:
         print(f"Processing data: {data}")
 
