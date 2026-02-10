@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
     test_data = [[1, 2, 3], "Hello Nexus", "INFO: System ready"]
 
-    for i, processor in enumerate(processors, 1):
+    for i, processor in enumerate(processors):
         try:
             res = processor.process(test_data[i])
             print(f"Result {i}: {processor.format_output(res)}\n")
