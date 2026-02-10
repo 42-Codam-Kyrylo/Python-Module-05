@@ -51,6 +51,21 @@ class ProcessingPipeline(ABC):
     def add_stage(self, stage: ProcessingStage) -> None:
         self.stages.append(stage)
 
+    def run_stages(self, data: Any) -> Any:
+        result = data
+        for stage in self.stages:
+            result = stage.process(result)
+        self.records_processed += 1
+        return result
+
+    def get_stats(self) -> Dict[str, Union[str, int, float]]:
+        return {
+            "id": self.pipeline_id,
+            "stages": len(self.stages),
+            "records_processed": self.records_processed,
+            "efficiency": self.efficiency,
+        }
+
     @abstractmethod
     def process(self, data: Any) -> Any:
         pass
@@ -64,8 +79,10 @@ class JSONAdapter(ProcessingPipeline):
     def process(self, data: Any) -> Any:
         if not isinstance(data, dict):
             raise ValueError("JSON adapter requires dict input")
+
+        self.run_stages(data)
+
         try:
-            self.records_processed += 1
             value = data.get("value", 0)
             unit = data.get("unit", "")
             status = "Normal range" if value < 50 else "Warning"
@@ -86,8 +103,10 @@ class CSVAdapter(ProcessingPipeline):
     def process(self, data: Any) -> Any:
         if not isinstance(data, str):
             raise ValueError("CSV adapter requires string input")
+        
+        self.run_stages(data)
+
         try:
-            self.records_processed += 1
             rows = [r for r in data.strip().split("\n") if r.strip()]
             return (
                 f"User activity logged: "
@@ -106,8 +125,10 @@ class StreamAdapter(ProcessingPipeline):
     def process(self, data: Any) -> Any:
         if not isinstance(data, list):
             raise ValueError("Stream adapter requires list input")
+
+        self.run_stages(data)
+
         try:
-            self.records_processed += 1
             count = len(data)
             avg = sum(data) / count if count > 0 else 0.0
             return (
@@ -271,6 +292,16 @@ if __name__ == "__main__":
     results = manager.process_all(data_map)
     for r in results:
         print(f"- {r}")
+
+    # --- Pipeline Statistics ---
+    print("\n=== Pipeline Statistics ===")
+    for pipeline in manager.pipelines:
+        stats = pipeline.get_stats()
+        print(
+            f"- {stats['id']}: {stats['records_processed']} records, "
+            f"{stats['stages']} stages, "
+            f"{stats['efficiency']}% efficiency"
+        )
 
     print(
         "\nNexus Integration complete. All systems operational."
