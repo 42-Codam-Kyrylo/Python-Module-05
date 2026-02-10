@@ -182,21 +182,15 @@ class StreamProcessor:
     def add_stream(self, stream: DataStream) -> None:
         self.streams.append(stream)
 
-    def process_all(
-        self, batches: Dict[str, List[Any]]
-    ) -> List[str]:
+    def process_all(self, batches: Dict[str, List[Any]]) -> List[str]:
         results: List[str] = []
         for stream in self.streams:
             if stream.stream_id in batches:
                 try:
-                    result = stream.process_batch(
-                        batches[stream.stream_id]
-                    )
+                    result = stream.process_batch(batches[stream.stream_id])
                     results.append(result)
                 except ValueError as e:
-                    results.append(
-                        f"Error processing {stream.stream_id}: {e}"
-                    )
+                    results.append(f"Error processing {stream.stream_id}: {e}")
         return results
 
     def filter_all(
@@ -296,5 +290,4 @@ if __name__ == "__main__":
         f"{len(transaction_filtered)} large transaction"
     )
 
-    print("\nAll streams processed successfully. "
-          "Nexus throughput optimal.")
+    print("\nAll streams processed successfully. " "Nexus throughput optimal.")

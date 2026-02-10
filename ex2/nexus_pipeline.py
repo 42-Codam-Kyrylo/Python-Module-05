@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Any, List, Dict, Union, Optional, Protocol
+from typing import Any, List, Dict, Union, Protocol
 
 
 class ProcessingStage(Protocol):
     """Protocol for pipeline processing stages (duck typing)."""
 
-    def process(self, data: Any) -> Any:
-        ...
+    def process(self, data: Any) -> Any: ...
 
 
 class InputStage:
@@ -70,6 +69,7 @@ class ProcessingPipeline(ABC):
     def process(self, data: Any) -> Any:
         pass
 
+
 class JSONAdapter(ProcessingPipeline):
     """Adapter for processing JSON-formatted data."""
 
@@ -103,15 +103,12 @@ class CSVAdapter(ProcessingPipeline):
     def process(self, data: Any) -> Any:
         if not isinstance(data, str):
             raise ValueError("CSV adapter requires string input")
-        
+
         self.run_stages(data)
 
         try:
             rows = [r for r in data.strip().split("\n") if r.strip()]
-            return (
-                f"User activity logged: "
-                f"{len(rows)} actions processed"
-            )
+            return f"User activity logged: " f"{len(rows)} actions processed"
         except (ValueError, TypeError) as e:
             raise ValueError(f"CSV processing error: {e}")
 
@@ -132,8 +129,7 @@ class StreamAdapter(ProcessingPipeline):
             count = len(data)
             avg = sum(data) / count if count > 0 else 0.0
             return (
-                f"Stream summary: {count} readings, "
-                f"avg: {avg:.1f}\u00b0C"
+                f"Stream summary: {count} readings, " f"avg: {avg:.1f}\u00b0C"
             )
         except (ValueError, TypeError) as e:
             raise ValueError(f"Stream processing error: {e}")
@@ -149,27 +145,20 @@ class NexusManager:
     def add_pipeline(self, pipeline: ProcessingPipeline) -> None:
         self.pipelines.append(pipeline)
 
-    def process_all(
-        self, data_map: Dict[str, Any]
-    ) -> List[str]:
+    def process_all(self, data_map: Dict[str, Any]) -> List[str]:
         results: List[str] = []
         for pipeline in self.pipelines:
             if pipeline.pipeline_id in data_map:
                 try:
-                    result = pipeline.process(
-                        data_map[pipeline.pipeline_id]
-                    )
+                    result = pipeline.process(data_map[pipeline.pipeline_id])
                     results.append(str(result))
                 except ValueError as e:
                     results.append(
-                        f"Error processing "
-                        f"{pipeline.pipeline_id}: {e}"
+                        f"Error processing " f"{pipeline.pipeline_id}: {e}"
                     )
         return results
 
-    def chain_pipelines(
-        self, data: Any, records: int = 100
-    ) -> str:
+    def chain_pipelines(self, data: Any, records: int = 100) -> str:
         stages_count = len(self.pipelines)
         return (
             f"Chain result: {records} records processed "
@@ -204,7 +193,9 @@ if __name__ == "__main__":
     json_adapter.add_stage(transform_stage)
     json_adapter.add_stage(output_stage)
     json_data: Dict[str, Any] = {
-        "sensor": "temp", "value": 23.5, "unit": "C",
+        "sensor": "temp",
+        "value": 23.5,
+        "unit": "C",
     }
     print('Input: {"sensor": "temp", "value": 23.5, "unit": "C"}')
     print("Transform: Enriched with metadata and validation")
@@ -272,10 +263,7 @@ if __name__ == "__main__":
     backup = JSONAdapter("BACKUP_001")
     try:
         backup.process({"sensor": "temp", "value": 23.5, "unit": "C"})
-        print(
-            "Recovery successful: Pipeline restored, "
-            "processing resumed"
-        )
+        print("Recovery successful: Pipeline restored, " "processing resumed")
     except ValueError as e:
         print(f"Recovery failed: {e}")
 
@@ -303,6 +291,4 @@ if __name__ == "__main__":
             f"{stats['efficiency']}% efficiency"
         )
 
-    print(
-        "\nNexus Integration complete. All systems operational."
-    )
+    print("\nNexus Integration complete. All systems operational.")
